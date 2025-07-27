@@ -1,3 +1,5 @@
+export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday';
+
 export interface Subject {
   id: string;
   name: string;
@@ -8,22 +10,42 @@ export interface Subject {
     thursday: string;
     friday: string;
   };
+  startTime?: string;
+  endTime?: string;
   resources: {
     bookLink: string;
     googleDocLink: string;
   };
   frequency: {
     daysPerWeek: number;
-    selectedDays: string[];
+    selectedDays: DayOfWeek[];
   };
 }
 
 export interface LessonPlan {
-  id: string;
-  name: string;
   subjects: Subject[];
-  createdAt: Date;
-  updatedAt: Date;
 }
 
-export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday'; 
+// Theme and Color Picker Types
+export interface ThemeColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  surface: string;
+  text: string;
+  textSecondary: string;
+}
+
+export interface ThemePreset {
+  id: string;
+  name: string;
+  colors: ThemeColors;
+  description: string;
+}
+
+export interface UserTheme {
+  currentPreset: string;
+  customColors?: Partial<ThemeColors>;
+  isDarkMode: boolean;
+} 

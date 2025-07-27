@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Calendar, BookOpen, Settings, AlertCircle, Upload, Zap } from 'lucide-react';
-import { Subject, LessonPlan } from './types';
+import { Plus, Calendar, BookOpen, Settings, AlertCircle, Upload, Zap, Palette } from 'lucide-react';
+import { Subject, LessonPlan, UserTheme } from './types';
 import { SubjectForm } from './components/SubjectForm';
 import { SubjectCard } from './components/SubjectCard';
 import { WeeklySchedule } from './components/WeeklySchedule';
 import { BulkSubjectImporter } from './components/BulkSubjectImporter';
 import { QuickSubjectAdder } from './components/QuickSubjectAdder';
 import { ApiDebugger } from './components/ApiDebugger';
+import { ColorPicker } from './components/ColorPicker';
 import { ApiService } from './services/api';
+import ThemeService from './services/themeService';
 
 function App() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -20,6 +22,12 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [apiConnected, setApiConnected] = useState(false);
   const [showApiDebugger, setShowApiDebugger] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState<UserTheme>(() => {
+    // Initialize theme service on app start
+    const themeService = ThemeService.getInstance();
+    return themeService.getCurrentTheme();
+  });
 
   // Check API connection and load data from database
   useEffect(() => {
@@ -185,48 +193,65 @@ function App() {
     }
   };
 
+  const handleThemeChange = (theme: UserTheme) => {
+    setCurrentTheme(theme);
+    ThemeService.getInstance().updateTheme(theme);
+  };
+
   return (
-    <div className="min-h-screen bg-primary-50">
-      {/* Header */}
-      <header className="header-card rounded-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-20">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg">
-                <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+    <div className="min-h-screen">
+              {/* Header */}
+        <header className="header-card rounded-none">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16 sm:h-20">
+              <div className="flex items-center gap-3 sm:gap-4">
+                {/* Logo Container */}
+                <div className="logo-container flex items-center gap-2 sm:gap-3">
+                  <div className="p-2 sm:p-3 bg-gradient-to-br from-white/25 to-white/10 rounded-2xl backdrop-blur-xl border border-white/20 shadow-lg">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center">
+                      <div className="w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full"></div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <h1 className="logo-font text-lg sm:text-xl lg:text-2xl text-white tracking-wide">
+                      xevilearning
+                    </h1>
+                    <div className="hidden sm:block">
+                      <div className="h-0.5 bg-gradient-to-r from-white/60 to-transparent rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Lesson Planner</h1>
-            </div>
-            
-            <div className="flex items-center gap-2 sm:gap-4">
-              <button
-                onClick={() => setActiveView('subjects')}
-                className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
-                  activeView === 'subjects'
-                    ? 'bg-white/20 text-white'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <BookOpen size={14} className="sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Subjects</span>
-                <span className="sm:hidden">Sub</span>
-              </button>
-              <button
-                onClick={() => setActiveView('schedule')}
-                className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
-                  activeView === 'schedule'
-                    ? 'bg-white/20 text-white'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <Calendar size={14} className="sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Schedule</span>
-                <span className="sm:hidden">Sch</span>
-              </button>
+              
+              <div className="flex items-center gap-2 sm:gap-4">
+                <button
+                  onClick={() => setActiveView('subjects')}
+                  className={`nav-tab ${activeView === 'subjects' ? 'active' : ''}`}
+                >
+                  <BookOpen size={14} className="sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Subjects</span>
+                  <span className="sm:hidden">Sub</span>
+                </button>
+                <button
+                  onClick={() => setActiveView('schedule')}
+                  className={`nav-tab ${activeView === 'schedule' ? 'active' : ''}`}
+                >
+                  <Calendar size={14} className="sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Schedule</span>
+                  <span className="sm:hidden">Sch</span>
+                </button>
+                <button
+                  onClick={() => setShowColorPicker(true)}
+                  className="nav-tab"
+                  title="Customize Theme"
+                >
+                  <Palette size={14} className="sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Theme</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -245,8 +270,8 @@ function App() {
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-              <p className="text-primary-700">Loading your lesson plan...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+              <p className="text-slate-700">Loading your lesson plan...</p>
             </div>
           </div>
         ) : showForm ? (
@@ -270,10 +295,10 @@ function App() {
             {activeView === 'subjects' ? (
               <>
                 {/* Subjects Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
                   <div>
-                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Subjects</h2>
-                    <p className="text-gray-600 mt-1 text-sm sm:text-base">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-800">Subjects</h2>
+                    <p className="text-slate-600 mt-1 text-sm sm:text-base">
                       Manage your subjects and their schedules
                     </p>
                   </div>
@@ -307,14 +332,14 @@ function App() {
 
                 {/* Subjects Grid */}
                 {subjects.length === 0 ? (
-                  <div className="card text-center py-8 sm:py-12">
-                    <div className="p-3 sm:p-4 bg-primary-50 rounded-full w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 flex items-center justify-center">
-                      <BookOpen size={24} className="sm:w-8 sm:h-8 text-primary-600" />
+                  <div className="empty-state">
+                    <div className="empty-state-icon">
+                      <BookOpen size={32} className="text-indigo-600" />
                     </div>
-                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg sm:text-xl font-semibold text-slate-800 mb-2">
                       No subjects yet
                     </h3>
-                    <p className="text-primary-700 mb-4 sm:mb-6 text-sm sm:text-base">
+                    <p className="text-slate-600 mb-4 sm:mb-6 text-sm sm:text-base">
                       Start by adding your first subject to create your lesson plan.
                     </p>
                     <button
@@ -327,24 +352,35 @@ function App() {
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {subjects.map((subject) => (
-                      <SubjectCard
-                        key={subject.id}
-                        subject={subject}
-                        onEdit={handleEditSubject}
-                        onDelete={handleDeleteSubject}
-                      />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-fade-in">
+                    {subjects.map((subject, index) => (
+                      <div key={subject.id} style={{ animationDelay: `${index * 0.1}s` }} className="animate-fade-in">
+                        <SubjectCard
+                          subject={subject}
+                          onEdit={handleEditSubject}
+                          onDelete={handleDeleteSubject}
+                        />
+                      </div>
                     ))}
                   </div>
                 )}
               </>
             ) : (
-              <WeeklySchedule subjects={subjects} />
+              <div className="animate-fade-in">
+                <WeeklySchedule subjects={subjects} />
+              </div>
             )}
           </div>
         )}
       </main>
+      
+      {/* Color Picker */}
+      <ColorPicker
+        isOpen={showColorPicker}
+        onClose={() => setShowColorPicker(false)}
+        currentTheme={currentTheme}
+        onThemeChange={handleThemeChange}
+      />
       
       {/* API Debugger */}
       <ApiDebugger 

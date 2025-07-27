@@ -21,20 +21,20 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({ subject, onEdit, onDel
   };
 
   return (
-    <div className="card hover:shadow-md transition-shadow duration-200">
+    <div className="subject-card">
       <div className="flex items-start justify-between mb-4">
         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 pr-2">{subject.name}</h3>
         <div className="flex gap-1 sm:gap-2 flex-shrink-0">
           <button
             onClick={() => onEdit(subject)}
-            className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+            className="action-btn"
             title="Edit subject"
           >
             <Edit size={16} />
           </button>
           <button
             onClick={() => onDelete(subject.id)}
-            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="action-btn hover:text-red-600 hover:bg-red-50/50"
             title="Delete subject"
           >
             <Trash2 size={16} />
@@ -44,39 +44,47 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({ subject, onEdit, onDel
 
       {/* Schedule Times */}
       <div className="mb-4">
-        <h4 className="text-sm font-medium text-primary-700 mb-2 flex items-center gap-2">
+        <h4 className="text-sm font-medium text-indigo-700 mb-2 flex items-center gap-2">
           <Clock size={14} />
           Schedule
         </h4>
-        <div className="grid grid-cols-5 gap-1 sm:gap-2 text-xs">
-          {DAYS.map((day) => (
-            <div key={day} className="text-center">
-              <div className="font-medium text-primary-600 capitalize">
-                {day.slice(0, 3)}
-              </div>
-              <div className="text-primary-500">
-                {formatTime(subject.times[day])}
-              </div>
-            </div>
-          ))}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-indigo-600">
+            {(() => {
+              const times = Object.values(subject.times).filter(time => time);
+              if (times.length === 0) return 'No time set';
+              
+              const startTime = times[0];
+              const startTimeFormatted = formatTime(startTime);
+              
+              // If we have start/end times, show the range
+              if (subject.startTime && subject.endTime) {
+                const endTimeFormatted = formatTime(subject.endTime);
+                return `${startTimeFormatted} - ${endTimeFormatted}`;
+              }
+              
+              // Otherwise just show start time
+              return startTimeFormatted;
+            })()}
+          </span>
         </div>
       </div>
 
       {/* Frequency */}
       <div className="mb-4">
-        <h4 className="text-sm font-medium text-primary-700 mb-2 flex items-center gap-2">
+        <h4 className="text-sm font-medium text-indigo-700 mb-2 flex items-center gap-2">
           <Calendar size={14} />
           Frequency
         </h4>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <span className="text-sm text-primary-600">
+          <span className="text-sm text-indigo-600">
             {subject.frequency.daysPerWeek} {subject.frequency.daysPerWeek === 1 ? 'day' : 'days'} per week:
           </span>
           <div className="flex flex-wrap gap-1">
             {subject.frequency.selectedDays.map((day) => (
               <span
                 key={day}
-                className="px-2 py-1 bg-primary-200 text-primary-700 text-xs rounded-md font-medium capitalize"
+                className="tag capitalize"
               >
                 {day.slice(0, 3)}
               </span>
@@ -87,14 +95,14 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({ subject, onEdit, onDel
 
       {/* Resources */}
       <div>
-        <h4 className="text-sm font-medium text-primary-700 mb-2">Resources</h4>
+        <h4 className="text-sm font-medium text-indigo-700 mb-2">Resources</h4>
         <div className="space-y-2">
           {subject.resources.bookLink && (
             <a
               href={subject.resources.bookLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 transition-colors"
+              className="link flex items-center gap-2 text-sm"
             >
               <BookOpen size={14} />
               <span className="truncate">Book Link</span>
@@ -105,14 +113,14 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({ subject, onEdit, onDel
               href={subject.resources.googleDocLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 transition-colors"
+              className="link flex items-center gap-2 text-sm"
             >
               <FileText size={14} />
               <span className="truncate">Google Doc</span>
             </a>
           )}
           {!subject.resources.bookLink && !subject.resources.googleDocLink && (
-            <span className="text-sm text-primary-500">No resources added</span>
+            <span className="text-sm text-slate-500">No resources added</span>
           )}
         </div>
       </div>

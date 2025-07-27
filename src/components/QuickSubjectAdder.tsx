@@ -41,6 +41,10 @@ export const QuickSubjectAdder: React.FC<QuickSubjectAdderProps> = ({ onAdd, onC
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [customSubject, setCustomSubject] = useState<string>('');
+  const [startTime, setStartTime] = useState<string>('');
+  const [endTime, setEndTime] = useState<string>('');
+  const [useCustomTime, setUseCustomTime] = useState<boolean>(false);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
 
   const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 
@@ -50,6 +54,15 @@ export const QuickSubjectAdder: React.FC<QuickSubjectAdderProps> = ({ onAdd, onC
         ? prev.filter(s => s !== subject)
         : [...prev, subject]
     );
+    
+    // Clear subjects error when user makes a selection
+    if (errors.subjects) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.subjects;
+        return newErrors;
+      });
+    }
   };
 
   const toggleDay = (day: string) => {
@@ -58,30 +71,85 @@ export const QuickSubjectAdder: React.FC<QuickSubjectAdderProps> = ({ onAdd, onC
         ? prev.filter(d => d !== day)
         : [...prev, day]
     );
+    
+    // Clear days error when user makes a selection
+    if (errors.days) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.days;
+        return newErrors;
+      });
+    }
   };
 
   const addCustomSubject = () => {
     if (customSubject.trim() && !selectedSubjects.includes(customSubject.trim())) {
       setSelectedSubjects(prev => [...prev, customSubject.trim()]);
       setCustomSubject('');
+      
+      // Clear subjects error when user adds a subject
+      if (errors.subjects) {
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors.subjects;
+          return newErrors;
+        });
+      }
     }
   };
 
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+
+    // Validate time selection
+    if (!useCustomTime && !selectedTime) {
+      newErrors.time = 'Please select a time';
+    }
+
+    if (useCustomTime) {
+      if (!startTime) {
+        newErrors.startTime = 'Start time is required';
+      }
+      if (!endTime) {
+        newErrors.endTime = 'End time is required';
+      }
+      if (startTime && endTime && startTime >= endTime) {
+        newErrors.endTime = 'End time must be after start time';
+      }
+    }
+
+    // Validate days selection
+    if (selectedDays.length === 0) {
+      newErrors.days = 'Please select at least one day';
+    }
+
+    // Validate subjects selection
+    if (selectedSubjects.length === 0) {
+      newErrors.subjects = 'Please select at least one subject';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const createSubjects = () => {
-    if (!selectedTime || selectedDays.length === 0 || selectedSubjects.length === 0) {
-      alert('Please select a time, days, and at least one subject.');
+    if (!validateForm()) {
       return;
     }
+
+    const timeToUse = useCustomTime ? startTime : selectedTime;
 
     const subjects: Subject[] = selectedSubjects.map(subjectName => ({
       id: crypto.randomUUID(),
       name: subjectName,
+      startTime: useCustomTime ? startTime : undefined,
+      endTime: useCustomTime ? endTime : undefined,
       times: {
-        monday: selectedDays.includes('monday') ? selectedTime : '',
-        tuesday: selectedDays.includes('tuesday') ? selectedTime : '',
-        wednesday: selectedDays.includes('wednesday') ? selectedTime : '',
-        thursday: selectedDays.includes('thursday') ? selectedTime : '',
-        friday: selectedDays.includes('friday') ? selectedTime : '',
+        monday: selectedDays.includes('monday') ? timeToUse : '',
+        tuesday: selectedDays.includes('tuesday') ? timeToUse : '',
+        wednesday: selectedDays.includes('wednesday') ? timeToUse : '',
+        thursday: selectedDays.includes('thursday') ? timeToUse : '',
+        friday: selectedDays.includes('friday') ? timeToUse : '',
       },
       resources: {
         bookLink: '',
@@ -105,47 +173,143 @@ export const QuickSubjectAdder: React.FC<QuickSubjectAdderProps> = ({ onAdd, onC
   };
 
   return (
-    <div className="card max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Zap size={24} />
-          Quick Subject Adder
-        </h2>
-        <button
-          onClick={onCancel}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <X size={24} />
-        </button>
-      </div>
+    <div className="modal-content max-w-4xl mx-auto">
+      <div className="form-container">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Zap size={24} />
+            Quick Subject Adder
+          </h2>
+          <button
+            onClick={onCancel}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
-      <div className="space-y-6">
+        <div className="form-section">
         {/* Time Selection */}
         <div>
-          <h3 className="text-lg font-semibold text-primary-700 mb-3 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-indigo-700 mb-3 flex items-center gap-2">
             <Clock size={18} />
             Select Time
           </h3>
-          <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
-            {COMMON_TIMES.map((time) => (
-              <button
-                key={time}
-                onClick={() => setSelectedTime(time)}
-                className={`p-3 rounded-lg border-2 transition-colors text-sm font-medium ${
-                  selectedTime === time
-                    ? 'border-primary-500 bg-primary-50 text-primary-700'
-                    : 'border-primary-200 hover:border-primary-300 text-primary-600'
-                }`}
-              >
-                {formatTime(time)}
-              </button>
-            ))}
+          
+          {/* Time Mode Toggle */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setUseCustomTime(false)}
+              className={`px-4 py-2 rounded-lg border-2 transition-colors text-sm font-medium ${
+                !useCustomTime
+                  ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                  : 'border-slate-200 hover:border-indigo-300 text-slate-600'
+              }`}
+            >
+              Quick Times
+            </button>
+            <button
+              onClick={() => setUseCustomTime(true)}
+              className={`px-4 py-2 rounded-lg border-2 transition-colors text-sm font-medium ${
+                useCustomTime
+                  ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                  : 'border-slate-200 hover:border-indigo-300 text-slate-600'
+              }`}
+            >
+              Custom Times
+            </button>
           </div>
+
+          {!useCustomTime ? (
+            /* Quick Times */
+            <div>
+              <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+                {COMMON_TIMES.map((time) => (
+                  <button
+                    key={time}
+                    onClick={() => {
+                      setSelectedTime(time);
+                      // Clear time error when user selects a time
+                      if (errors.time) {
+                        setErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors.time;
+                          return newErrors;
+                        });
+                      }
+                    }}
+                    className={`time-btn ${selectedTime === time ? 'selected' : ''}`}
+                  >
+                    {formatTime(time)}
+                  </button>
+                ))}
+              </div>
+              {errors.time && (
+                <p className="text-red-600 text-sm mt-2">{errors.time}</p>
+              )}
+            </div>
+          ) : (
+            /* Custom Times */
+            <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-indigo-700 mb-2">
+                    Start Time *
+                  </label>
+                  <input
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => {
+                      setStartTime(e.target.value);
+                      // Clear start time error when user types
+                      if (errors.startTime) {
+                        setErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors.startTime;
+                          return newErrors;
+                        });
+                      }
+                    }}
+                    className={`input-field ${errors.startTime ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    required
+                  />
+                  {errors.startTime && (
+                    <p className="text-red-600 text-sm mt-1">{errors.startTime}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-indigo-700 mb-2">
+                    End Time *
+                  </label>
+                  <input
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => {
+                      setEndTime(e.target.value);
+                      // Clear end time error when user types
+                      if (errors.endTime) {
+                        setErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors.endTime;
+                          return newErrors;
+                        });
+                      }
+                    }}
+                    className={`input-field ${errors.endTime ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    required
+                  />
+                  {errors.endTime && (
+                    <p className="text-red-600 text-sm mt-1">{errors.endTime}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Day Selection */}
         <div>
-          <h3 className="text-lg font-semibold text-primary-700 mb-3 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-indigo-700 mb-3 flex items-center gap-2">
             <Calendar size={18} />
             Select Days
           </h3>
@@ -154,11 +318,7 @@ export const QuickSubjectAdder: React.FC<QuickSubjectAdderProps> = ({ onAdd, onC
               <button
                 key={day}
                 onClick={() => toggleDay(day)}
-                className={`p-3 rounded-lg border-2 transition-colors ${
-                  selectedDays.includes(day)
-                    ? 'border-primary-500 bg-primary-50 text-primary-700'
-                    : 'border-primary-200 hover:border-primary-300'
-                }`}
+                className={`day-btn ${selectedDays.includes(day) ? 'selected' : ''}`}
               >
                 <span className="text-sm font-medium capitalize">
                   {day.slice(0, 3)}
@@ -166,11 +326,14 @@ export const QuickSubjectAdder: React.FC<QuickSubjectAdderProps> = ({ onAdd, onC
               </button>
             ))}
           </div>
+          {errors.days && (
+            <p className="text-red-600 text-sm mt-2">{errors.days}</p>
+          )}
         </div>
 
         {/* Subject Selection */}
         <div>
-          <h3 className="text-lg font-semibold text-primary-700 mb-3">
+          <h3 className="text-lg font-semibold text-indigo-700 mb-3">
             Select Subjects
           </h3>
           
@@ -180,11 +343,7 @@ export const QuickSubjectAdder: React.FC<QuickSubjectAdderProps> = ({ onAdd, onC
               <button
                 key={subject}
                 onClick={() => toggleSubject(subject)}
-                className={`p-2 rounded-lg border-2 transition-colors text-sm text-left ${
-                  selectedSubjects.includes(subject)
-                    ? 'border-primary-500 bg-primary-50 text-primary-700'
-                    : 'border-primary-200 hover:border-primary-300 text-primary-600'
-                }`}
+                className={`subject-btn ${selectedSubjects.includes(subject) ? 'selected' : ''}`}
               >
                 {subject}
               </button>
@@ -209,13 +368,16 @@ export const QuickSubjectAdder: React.FC<QuickSubjectAdderProps> = ({ onAdd, onC
               Add
             </button>
           </div>
+          {errors.subjects && (
+            <p className="text-red-600 text-sm mt-2">{errors.subjects}</p>
+          )}
         </div>
 
         {/* Selected Items Summary */}
         {(selectedSubjects.length > 0 || selectedTime || selectedDays.length > 0) && (
-          <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
-            <h4 className="font-semibold text-primary-700 mb-2">Summary:</h4>
-            <div className="space-y-2 text-sm text-primary-600">
+          <div className="summary-card">
+            <h4 className="font-semibold text-indigo-700 mb-2">Summary:</h4>
+            <div className="space-y-2 text-sm text-indigo-600">
               {selectedTime && (
                 <div>Time: {formatTime(selectedTime)}</div>
               )}
@@ -230,10 +392,9 @@ export const QuickSubjectAdder: React.FC<QuickSubjectAdderProps> = ({ onAdd, onC
         )}
 
         {/* Actions */}
-        <div className="flex gap-4 pt-4 border-t border-primary-200">
+        <div className="form-actions">
           <button
             onClick={createSubjects}
-            disabled={!selectedTime || selectedDays.length === 0 || selectedSubjects.length === 0}
             className="btn-primary flex items-center gap-2"
           >
             <Plus size={16} />
@@ -245,6 +406,7 @@ export const QuickSubjectAdder: React.FC<QuickSubjectAdderProps> = ({ onAdd, onC
           >
             Cancel
           </button>
+        </div>
         </div>
       </div>
     </div>

@@ -138,25 +138,26 @@ export const BulkSubjectImporter: React.FC<BulkSubjectImporterProps> = ({ onImpo
   };
 
   return (
-    <div className="card max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Upload size={24} />
-          Import from Google Sheets
-        </h2>
-        <button
-          onClick={onCancel}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <X size={24} />
-        </button>
-      </div>
+    <div className="modal-content max-w-4xl mx-auto">
+      <div className="form-container">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Upload size={24} />
+            Import from Google Sheets
+          </h2>
+          <button
+            onClick={onCancel}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
-      <div className="space-y-6">
+        <div className="form-section">
         {/* Instructions */}
-        <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
-          <h3 className="font-semibold text-primary-700 mb-2">How to import:</h3>
-          <ol className="text-sm text-primary-600 space-y-1 list-decimal list-inside">
+        <div className="bg-indigo-50/50 border border-indigo-200/50 rounded-lg p-4">
+          <h3 className="font-semibold text-indigo-700 mb-2">How to import:</h3>
+          <ol className="text-sm text-indigo-600 space-y-1 list-decimal list-inside">
             <li>Export your Google Sheet as CSV</li>
             <li>Copy the CSV data (including headers)</li>
             <li>Paste it in the text area below</li>
@@ -167,7 +168,7 @@ export const BulkSubjectImporter: React.FC<BulkSubjectImporterProps> = ({ onImpo
 
         {/* CSV Input */}
         <div>
-          <label className="block text-sm font-medium text-primary-700 mb-2">
+          <label className="block text-sm font-medium text-indigo-700 mb-2">
             Paste CSV Data
           </label>
           <textarea
@@ -191,21 +192,21 @@ export const BulkSubjectImporter: React.FC<BulkSubjectImporterProps> = ({ onImpo
         {/* Preview */}
         {previewSubjects.length > 0 && (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-primary-700">
+            <h3 className="text-lg font-semibold text-indigo-700">
               Preview ({previewSubjects.length} subjects found)
             </h3>
             
             <div className="max-h-96 overflow-y-auto space-y-3">
               {previewSubjects.map((subject) => (
-                <div key={subject.id} className="bg-white border border-primary-200 rounded-lg p-4">
+                <div key={subject.id} className="bg-white/95 border border-slate-200/60 rounded-lg p-4">
                   <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium text-gray-900">{subject.name}</h4>
-                    <span className="text-sm text-primary-600">
+                    <h4 className="font-medium text-slate-800">{subject.name}</h4>
+                    <span className="text-sm text-indigo-600">
                       {subject.frequency.daysPerWeek} {subject.frequency.daysPerWeek === 1 ? 'day' : 'days'}
                     </span>
                   </div>
                   
-                  <div className="flex items-center gap-4 text-sm text-primary-600">
+                  <div className="flex items-center gap-4 text-sm text-indigo-600">
                     <div className="flex items-center gap-1">
                       <Calendar size={14} />
                       {subject.frequency.selectedDays.map(day => day.slice(0, 3)).join(', ')}
@@ -219,7 +220,7 @@ export const BulkSubjectImporter: React.FC<BulkSubjectImporterProps> = ({ onImpo
               ))}
             </div>
 
-            <div className="flex gap-4 pt-4 border-t border-primary-200">
+            <div className="form-actions">
               <button
                 onClick={handleImport}
                 className="btn-primary flex items-center gap-2"
@@ -236,6 +237,7 @@ export const BulkSubjectImporter: React.FC<BulkSubjectImporterProps> = ({ onImpo
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
