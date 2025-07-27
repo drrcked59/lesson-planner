@@ -2,14 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Apple-like font system that works on all platforms */
 @layer base {
   body {
     @apply bg-primary-50 text-gray-900;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-variation-settings: 'opsz' 32;
   }
   
   * {
@@ -17,37 +20,97 @@
   }
   
   h1, h2, h3, h4, h5, h6 {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
     font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  /* Apple-like font classes */
+  .font-apple {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .font-inter {
+    font-family: 'Inter', sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Mobile touch targets */
+  button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Mobile scroll improvements */
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md font-apple;
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    min-height: 44px;
   }
   
   .btn-secondary {
-    @apply bg-white hover:bg-primary-50 text-primary-700 border border-primary-200 font-medium py-2 px-4 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md font-apple;
+    @apply bg-white hover:bg-primary-50 text-primary-700 border border-primary-200 font-medium py-2 px-4 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    min-height: 44px;
   }
   
   .input-field {
-    @apply w-full px-3 py-2 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300 bg-white font-apple;
+    @apply w-full px-3 py-2 border border-primary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300 bg-white;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    min-height: 44px;
   }
   
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-primary-100 p-6 hover:shadow-md transition-shadow duration-200 font-apple;
+    @apply bg-white rounded-xl shadow-sm border border-primary-100 p-6 hover:shadow-md transition-shadow duration-200;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
   }
   
   .header-card {
-    @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg font-apple;
+    @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    font-weight: 600;
+    letter-spacing: -0.025em;
   }
   
   .status-success {
-    @apply bg-primary-50 border border-primary-200 text-primary-800 font-apple;
+    @apply bg-primary-50 border border-primary-200 text-primary-800;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
   }
   
   .status-warning {
-    @apply bg-yellow-50 border border-yellow-200 text-yellow-800 font-apple;
+    @apply bg-yellow-50 border border-yellow-200 text-yellow-800;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  }
+
+  /* Mobile-specific improvements */
+  @media (max-width: 640px) {
+    .card {
+      @apply p-4;
+    }
+    
+    .btn-primary, .btn-secondary {
+      @apply py-3 px-4;
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .input-field {
+      @apply py-3;
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
   }
 } 

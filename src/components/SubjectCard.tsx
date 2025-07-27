@@ -23,8 +23,8 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({ subject, onEdit, onDel
   return (
     <div className="card hover:shadow-md transition-shadow duration-200">
       <div className="flex items-start justify-between mb-4">
-        <h3 className="text-xl font-semibold text-gray-900">{subject.name}</h3>
-        <div className="flex gap-2">
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 pr-2">{subject.name}</h3>
+        <div className="flex gap-1 sm:gap-2 flex-shrink-0">
           <button
             onClick={() => onEdit(subject)}
             className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
@@ -48,7 +48,7 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({ subject, onEdit, onDel
           <Clock size={14} />
           Schedule
         </h4>
-        <div className="grid grid-cols-5 gap-2 text-xs">
+        <div className="grid grid-cols-5 gap-1 sm:gap-2 text-xs">
           {DAYS.map((day) => (
             <div key={day} className="text-center">
               <div className="font-medium text-primary-600 capitalize">
@@ -68,11 +68,11 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({ subject, onEdit, onDel
           <Calendar size={14} />
           Frequency
         </h4>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
           <span className="text-sm text-primary-600">
             {subject.frequency.daysPerWeek} {subject.frequency.daysPerWeek === 1 ? 'day' : 'days'} per week:
           </span>
-          <div className="flex gap-1">
+          <div className="flex flex-wrap gap-1">
             {subject.frequency.selectedDays.map((day) => (
               <span
                 key={day}

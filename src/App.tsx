@@ -190,36 +190,38 @@ function App() {
       {/* Header */}
       <header className="header-card rounded-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <BookOpen className="h-8 w-8 text-white" />
+          <div className="flex items-center justify-between h-16 sm:h-20">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg">
+                <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-white">Lesson Planner</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">Lesson Planner</h1>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <button
                 onClick={() => setActiveView('subjects')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
                   activeView === 'subjects'
                     ? 'bg-white/20 text-white'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <Settings size={16} />
-                Subjects
+                <BookOpen size={14} className="sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Subjects</span>
+                <span className="sm:hidden">Sub</span>
               </button>
               <button
                 onClick={() => setActiveView('schedule')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
                   activeView === 'schedule'
                     ? 'bg-white/20 text-white'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <Calendar size={16} />
-                Schedule
+                <Calendar size={14} className="sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Schedule</span>
+                <span className="sm:hidden">Sch</span>
               </button>
             </div>
           </div>
@@ -227,7 +229,9 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        {/* Font Test Indicator */}
+        
         {/* Status Messages */}
         {error && (
           <div className="mb-6 p-4 status-warning rounded-lg">
@@ -266,60 +270,64 @@ function App() {
             {activeView === 'subjects' ? (
               <>
                 {/* Subjects Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h2 className="text-3xl font-bold text-gray-900">Subjects</h2>
-                    <p className="text-gray-600 mt-1">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Subjects</h2>
+                    <p className="text-gray-600 mt-1 text-sm sm:text-base">
                       Manage your subjects and their schedules
                     </p>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex flex-wrap gap-2 sm:gap-3">
                     <button
                       onClick={() => setShowBulkImport(true)}
-                      className="btn-secondary flex items-center gap-2"
+                      className="btn-secondary flex items-center gap-1.5 sm:gap-2 text-sm"
                     >
-                      <Upload size={16} />
-                      Import from Sheets
+                      <Upload size={14} className="sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Import from Sheets</span>
+                      <span className="sm:hidden">Import</span>
                     </button>
                     <button
                       onClick={() => setShowQuickAdd(true)}
-                      className="btn-secondary flex items-center gap-2"
+                      className="btn-secondary flex items-center gap-1.5 sm:gap-2 text-sm"
                     >
-                      <Zap size={16} />
-                      Quick Add
+                      <Zap size={14} className="sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Quick Add</span>
+                      <span className="sm:hidden">Quick</span>
                     </button>
                     <button
                       onClick={() => setShowForm(true)}
-                      className="btn-primary flex items-center gap-2"
+                      className="btn-primary flex items-center gap-1.5 sm:gap-2 text-sm"
                     >
-                      <Plus size={16} />
-                      Add Subject
+                      <Plus size={14} className="sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Add Subject</span>
+                      <span className="sm:hidden">Add</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Subjects Grid */}
                 {subjects.length === 0 ? (
-                  <div className="card text-center py-12">
-                    <div className="p-4 bg-primary-50 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                      <BookOpen size={32} className="text-primary-600" />
+                  <div className="card text-center py-8 sm:py-12">
+                    <div className="p-3 sm:p-4 bg-primary-50 rounded-full w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 flex items-center justify-center">
+                      <BookOpen size={24} className="sm:w-8 sm:h-8 text-primary-600" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                       No subjects yet
                     </h3>
-                    <p className="text-primary-700 mb-6">
+                    <p className="text-primary-700 mb-4 sm:mb-6 text-sm sm:text-base">
                       Start by adding your first subject to create your lesson plan.
                     </p>
                     <button
                       onClick={() => setShowForm(true)}
-                      className="btn-primary flex items-center gap-2 mx-auto"
+                      className="btn-primary flex items-center gap-1.5 sm:gap-2 mx-auto text-sm"
                     >
-                      <Plus size={16} />
-                      Add Your First Subject
+                      <Plus size={14} className="sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Add Your First Subject</span>
+                      <span className="sm:hidden">Add First Subject</span>
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {subjects.map((subject) => (
                       <SubjectCard
                         key={subject.id}
